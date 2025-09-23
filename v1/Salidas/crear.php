@@ -30,14 +30,24 @@ header("Content-Type: application/json");
 
 
 
-$datos = json_decode(file_get_contents('php://input'), true);
+    $datos = json_decode(file_get_contents('php://input'), true);
     $Tipo_salida = $datos['Tipo_salida'];
     $Monto = $datos['Monto'];
     $Fecha = $datos['Fecha'];
     $Factura = $datos['Factura'];
     $id_usuario = $datos['id_usuario'];
 
-    $sql = "INSERT INTO salidas (Tipo_salida, Monto, Fecha, Factura, id_usuario) VALUES ('$Tipo_salida', '$Monto', '$Fecha', '$Factura', '$id_usuario')";
+    // Variable para guardar en la BD
+    $factura_guardar = $Factura;
+
+    // Si Factura no está vacío, ejecutar la función imagen y obtener el nombre
+    if (!empty($Factura)) {
+        $nombre_imagen = imagen($Factura);
+        $factura_guardar = $nombre_imagen; // Guardar el nombre de la imagen en lugar del base64
+    }
+
+    //print_r($factura_guardar); // Verificar el valor que se va a guardar en la BD
+    $sql = "INSERT INTO salidas (Tipo_salida, Monto, Fecha, Factura, id_usuario) VALUES ('$Tipo_salida', '$Monto', '$Fecha', '$factura_guardar', '$id_usuario')";
     $result = $connection->query($sql);
 
    if($result){ 
@@ -48,5 +58,20 @@ $datos = json_decode(file_get_contents('php://input'), true);
     }
 
 
+function imagen($Factura){
+    $imagen = $Factura;
+
+    if (isset($imagen)) {
+        $direccion = dirname(__FILE__) . "\Public\imagenes\\";
+        $partes = explode(";base64,", $imagen);
+        $extension = explode("/", mime_content_type($imagen))[1];
+        $imagen_base64 = base64_decode($partes[1]);
+        $nombre_imagen1 = $direccion . uniqid() . "." . $extension;
+        file_put_contents($nombre_imagen1, $imagen_base64);
+        $nombre_imagen = str_replace("\\", "/", $nombre_imagen1); 
+        
+        return $nombre_imagen;
+    } 
+}
 
 ?>
