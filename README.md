@@ -27,7 +27,7 @@ C:\xampp\htdocs\
 - Pagar el SQL script para crear la base dedatos
 - Esto creará las tablas necesarias para la API.
 
-- CREATE TABLE usuarios( 
+CREATE TABLE usuarios( 
     id_usuario INT PRIMARY KEY AUTO_INCREMENT,
     Nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
     Password VARCHAR(255) NOT NULL,
